@@ -4,12 +4,17 @@ import json
 class MongoInstance:
 
     def __init__(self, endpoint, auth = None, dbname = "database"):
+        print("Initiating MongoInstance")
         self.endpoint = endpoint
         if auth == None:
             self.client = pm.MongoClient(f"mongodb://{endpoint}/")
         else:
             self.client = pm.MongoClient(f"mongodb://{auth}@{endpoint}/")
         self.db = self.client[dbname]
+        if self.health():
+            print(f"Serving on {endpoint}")
+        else:
+            print("Server error")
 
     def health(self):
         try:
@@ -42,7 +47,10 @@ class MongoInstance:
 
     def insert(self, collection, documents):
         try:
-            self.db[collection].insert_many(documents)
+            if isinstance(documents, list):
+                self.db[collection].insert_many(documents)
+            else:
+                self.db[collection].insert_one(documents)
             return {"success" : True}
         except Exception as e:
             return {"success" : False}
@@ -56,3 +64,12 @@ class MongoInstance:
             return {"success" : True, "deleted" : result.deleted_count}
         except Exception as e:
             return {"error" : "delete error", "message" : e}
+
+    def count(self, collection, filter = {}):
+        try:
+            return self.db[collection].count_documents(filter)
+        except:
+            return -1
+
+    def getCollection(self, collection_name):
+        return self.db[collection_name]
