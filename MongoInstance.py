@@ -4,6 +4,14 @@ import json
 class MongoInstance:
 
     def __init__(self, endpoint, auth = None, dbname = "database"):
+        """
+
+        Initiate connexion with mongo database
+
+        :param endpoint: ip:port
+        :param auth: user:password
+        :param dbname: dbname
+        """
         print("Initiating MongoInstance")
         self.endpoint = endpoint
         if auth == None:
